@@ -27,7 +27,7 @@ const Student_data =require('../modals/studentModal');
                     lastname : req.body.lastname,
                     dob: req.body.dob,
                     percentage: req.body.percentage,
-                    profile_picture: 'localhost:5000/student/profilePicture/'+req.file.filename 
+                    profile_picture:'localhost:5000/student/profilePicture/'+req.file.filename 
                 });
                 
                 userdata.save((err,data) => {
@@ -85,44 +85,10 @@ const Student_data =require('../modals/studentModal');
       const user_data = await Student_data.findById(req.params.id);
       console.log(user_data);
       if(user_data){
-        var Storage = multer.diskStorage({
-          destination: function(req, file, callback) {
-          callback(null, "./Student_Profile_Images");
-          },
-          
-          filename: function(req, file, callback) {
-          callback(null,file.fieldname+ "_" + Date.now() + "_" + file.originalname);
-          }
-        });
-       
-        var upload = multer({
-          storage: Storage
-          }).single("profile_picture");
-           
           const updatedUser = await Student_data.findById(req.params.id).exec();
-          upload(req,res,function(err){
-            const userdata = new Student_data({
-                firstname : req.body.firstname,
-                lastname : req.body.lastname,
-                dob: req.body.dob,
-                percentage: req.body.percentage,
-                profile_picture: 'localhost:3000/student/profilePicture/'+req.file.filename 
-            })
-            updatedUser.set(userdata);
-            userdata.save((err,data) => {
-                if (err) {
-                    return res.status(400).send({ message: "Somthing Went Wrong" });
-                } else{
-                   return res.status(200).json({ message: "Record Insearted", data });  
-                }
-              });
-
-       })
-
-          // const updatedUser = await Student_data.findById(req.params.id).exec();
-          // updatedUser.set(req.body);
-          // var result = await updatedUser.save();
-          // res.status(201).json({ "status": 200, "msg": 'record sucessfully updated', result });
+          updatedUser.set(req.body);
+          var result = await updatedUser.save();
+          res.status(201).json({ "status": 200, "msg": 'record sucessfully updated', result });
       }else
          {
            console.log(user_data)
